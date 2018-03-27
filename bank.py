@@ -11,7 +11,8 @@ from flask import Flask, request
 import logging
 
 TOKEN = "562924691:AAGgDvJrgPqN2QGxXEa9Zj_hnhP3NxKse3M"
-PORT = int(os.environ.get('PORT', '8443'))
+bot = telebot.TeleBot(TOKEN)
+server = Flask(__name__)
 
 url = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
 
@@ -110,18 +111,34 @@ def nbu_text(message):
         cc="gbp"
     elif message.text=="Всі валюти":
         cc="all"
-    bot.send_message(message.chat.id, nbu(cc))    
+    bot.send_message(message.chat.id, nbu(cc))
+
+@server.route('/' + TOKEN, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://your_heroku_project.com/' + TOKEN)
+    return "!", 200
 
 
 if __name__ == "__main__":
-    updater = Updater(TOKEN)
-    # add handlers
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=TOKEN)
-    updater.bot.set_webhook("https://<appname>.herokuapp.com/" + TOKEN)
-    updater.idle()
-    #bot.polling()
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+
+
+##if __name__ == "__main__":
+##    updater = Updater(TOKEN)
+##    # add handlers
+##    updater.start_webhook(listen="0.0.0.0",
+##                      port=PORT,
+##                      url_path=TOKEN)
+##    updater.bot.set_webhook("https://<appname>.herokuapp.com/" + TOKEN)
+##    updater.idle()
+##    #bot.polling()
 
 
 
