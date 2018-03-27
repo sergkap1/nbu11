@@ -6,6 +6,9 @@ from telebot import types
 import requests
 import json
 from collections import namedtuple
+import os
+from flask import Flask, request
+import logging
 
 TOKEN = "562924691:AAGgDvJrgPqN2QGxXEa9Zj_hnhP3NxKse3M"
 
@@ -110,7 +113,21 @@ def nbu_text(message):
 
 
 if __name__ == "__main__":
-    bot.polling()
+    logger = telebot.logger
+    telebot.logger.setLevel(logging.INFO)
+
+    server = Flask(__name__)
+    @server.route("/bot", methods=['POST'])
+    def getMessage():
+        bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+        return "!", 200
+    @server.route("/")
+    def webhook():
+        bot.remove_webhook()
+        bot.set_webhook(url="https://nbu11.herokuapp.com/bot") # этот url нужно заменить на url вашего Хероку приложения
+        return "?", 200
+    server.run(host="0.0.0.0", port=os.environ.get('PORT', 80))
+    #bot.polling()
 
 
 
