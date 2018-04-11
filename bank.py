@@ -6,13 +6,8 @@ from telebot import types
 import requests
 import json
 from collections import namedtuple
-import os
-from flask import Flask, request
-import logging
 
-TOKEN = "TOKEN"
-bot = telebot.TeleBot(TOKEN)
-server = Flask(__name__)
+TOKEN = "562924691:AAGgDvJrgPqN2QGxXEa9Zj_hnhP3NxKse3M"
 
 url = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
 
@@ -27,7 +22,7 @@ def nbu(message):
     i=1
     while i<len(x):
         if x[i].cc.lower()==message.lower():
-            stroka=x[i].exchangedate + ' : 1 Українська гривня - ' + str(x[i].rate) + ' ' +x[i].txt
+            stroka=x[i].exchangedate + ' : 1 ' +x[i].txt + ' - ' + str(x[i].rate) + ' Українська гривня'
             #bot.send_message(message.chat.id, stroka)
             #print (x[i].txt)
             break
@@ -72,7 +67,7 @@ def inline(c):
         x = json.loads(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         i=1
         while i<len(x):
-            stroka=x[i].exchangedate + ' : 1 Українська гривня - ' + str(x[i].rate) + ' ' +x[i].txt + ' ('+x[i].cc+')'
+            stroka=x[i].exchangedate + ' : 1 ' +x[i].txt + ' - ' + str(x[i].rate) + ' Українська гривня' + ' ('+x[i].cc+')'
             bot.send_message(c.message.chat.id, stroka)
             i=i+1
 
@@ -111,34 +106,11 @@ def nbu_text(message):
         cc="gbp"
     elif message.text=="Всі валюти":
         cc="all"
-    bot.send_message(message.chat.id, nbu(cc))
-
-@server.route('/' + TOKEN, methods=['POST'])
-def getMessage():
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    return "!", 200
-
-
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url='https://nbu11.herokuapp.com/' + TOKEN)
-    return "!", 200
+    bot.send_message(message.chat.id, nbu(cc))    
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-
-
-##if __name__ == "__main__":
-##    updater = Updater(TOKEN)
-##    # add handlers
-##    updater.start_webhook(listen="0.0.0.0",
-##                      port=PORT,
-##                      url_path=TOKEN)
-##    updater.bot.set_webhook("https://<appname>.herokuapp.com/" + TOKEN)
-##    updater.idle()
-##    #bot.polling()
+    bot.polling()
 
 
 
