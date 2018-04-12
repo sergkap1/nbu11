@@ -27,7 +27,7 @@ def nbu(message):
     i=1
     while i<len(x):
         if x[i].cc.lower()==message.lower():
-            stroka=x[i].exchangedate + ' : 1 Українська гривня - ' + str(x[i].rate) + ' ' +x[i].txt
+            stroka=x[i].exchangedate + ' : 1 ' +x[i].txt + ' - ' + str(x[i].rate) + ' Українська гривня'
             #bot.send_message(message.chat.id, stroka)
             #print (x[i].txt)
             break
@@ -72,7 +72,7 @@ def inline(c):
         x = json.loads(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         i=1
         while i<len(x):
-            stroka=x[i].exchangedate + ' : 1 Українська гривня - ' + str(x[i].rate) + ' ' +x[i].txt + ' ('+x[i].cc+')'
+            stroka=x[i].exchangedate + ' : 1 ' +x[i].txt + ' - ' + str(x[i].rate) + ' Українська гривня' + ' ('+x[i].cc+')'
             bot.send_message(c.message.chat.id, stroka)
             i=i+1
 
