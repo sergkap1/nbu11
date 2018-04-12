@@ -10,7 +10,7 @@ import os
 from flask import Flask, request
 import logging
 
-TOKEN = "562924691:AAGgDvJrgPqN2QGxXEa9Zj_hnhP3NxKse3M"
+TOKEN = "TOKEN"
 bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
 
